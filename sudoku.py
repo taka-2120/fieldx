@@ -15,6 +15,7 @@ class Sudoku:
             for _ in range(9):
                 array.append(0 if all_values[count] == "-" else int(all_values[count]))
                 count += 1
+
             self.cells.append(array)
 
     def print_sudoku(self, board):
@@ -24,6 +25,7 @@ class Sudoku:
             for j in range(len(board[0])):
                 if j % 3 == 0 and j != 0:
                     print(" |", end="")
+
                 value = " " if board[i][j] == 0 else str(board[i][j])
                 if j == 8:
                     print(" " + value)
@@ -43,17 +45,17 @@ class Sudoku:
             used.add(self.cells[r][col])
         for c in range(9):
             used.add(self.cells[row][c])
+
         r_start, c_start = 3 * (row // 3), 3 * (col // 3)
         for r in range(r_start, r_start + 3):
             for c in range(c_start, c_start + 3):
                 used.add(self.cells[r][c])
+
         return [num for num in range(1, 10) if num not in used]
 
     def solve(self):
         blank = self.getblank()
         if not blank:
-            print("Solved:")
-            self.print_sudoku(self.cells)
             return True
 
         row, col = blank
@@ -65,6 +67,7 @@ class Sudoku:
             self.cells[row][col] = candidate
             if self.solve():
                 return True
+
             self.cells[row][col] = 0
         return False
 
