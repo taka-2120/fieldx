@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-
 import time
-
-# shebang
 from typing import List
 
 
@@ -38,60 +35,47 @@ class Sudoku:
             for col in range(len(self.cells[row])):
                 if self.cells[row][col] == 0:
                     return (row, col)
-        raise RuntimeError
+        return None
 
     def get_candidates(self, row, col):
-        counter = {i: 0 for i in range(len(self.cells) + 1)}
-
-        for r in range(len(self.cells)):
-            counter[int(self.cells[r][col])] += 1
-
-        for c in range(len(self.cells[row])):
-            counter[int(self.cells[row][c])] += 1
-
-        for r in range(3 * (row // 3), 3 * (col // 3) + 3):
-            for c in range(3 * (col // 3), 3 * (row // 3) + 3):
-                counter[int(self.cells[r][c])] += 1
-
-        result: List[int] = []
-        for key, value in counter.items():
-            if value == 0:
-                result.append(key)
-        return result
+        used = set()
+        for r in range(9):
+            used.add(self.cells[r][col])
+        for c in range(9):
+            used.add(self.cells[row][c])
+        r_start, c_start = 3 * (row // 3), 3 * (col // 3)
+        for r in range(r_start, r_start + 3):
+            for c in range(c_start, c_start + 3):
+                used.add(self.cells[r][c])
+        return [num for num in range(1, 10) if num not in used]
 
     def solve(self):
-        try:
-            row, col = self.getblank()
-        except RuntimeError:
-            print("solved")
+        blank = self.getblank()
+        if not blank:
+            print("Solved:")
+            self.print_sudoku(self.cells)
             return True
 
+        row, col = blank
         candidates = self.get_candidates(row, col)
-        if len(candidates) == 0:
+        if not candidates:
             return False
 
         for candidate in candidates:
             self.cells[row][col] = candidate
-            self.print_sudoku(self.cells)
-            time.sleep(1.3)  # Seconds
-            # if enter == "":
-            #     pass
-            # else:
-            #     raise RuntimeError
-
             if self.solve():
                 return True
             self.cells[row][col] = 0
         return False
 
-    def dump(self):
-        self.print_sudoku(self.cells)
-
 
 def main():
     sdk = Sudoku()
     if sdk.solve():
-        sdk.dump()
+        print("Solution found:")
+        sdk.print_sudoku(sdk.cells)
+    else:
+        print("No solution exists.")
 
 
 main()
